@@ -423,6 +423,82 @@
             color: #0f2027;
         }
 
+        .riddle-card {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border: 2px solid #fed7aa;
+            border-radius: 15px;
+            padding: 22px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 22px rgba(221, 107, 32, 0.18);
+        }
+
+        .riddle-card h2 {
+            color: #9a3412;
+            border-bottom: 2px solid #fdba74;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            font-size: 1.35rem;
+        }
+
+        .riddle-question {
+            color: #7c2d12;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+
+        .riddle-actions {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .riddle-actions input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #fdba74;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .riddle-actions input:focus {
+            outline: none;
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
+        }
+
+        .riddle-actions .btn {
+            width: auto;
+            margin-bottom: 0;
+            white-space: nowrap;
+            background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+        }
+
+        .riddle-feedback {
+            display: none;
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .riddle-feedback.success {
+            display: block;
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .riddle-feedback.hint {
+            display: block;
+            background: #ffedd5;
+            color: #9a3412;
+            border: 1px solid #fdba74;
+        }
+
+
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -448,6 +524,16 @@
         <div class="main-content">
             <div class="control-panel">
                 <h2>🎯 Control Panel</h2>
+
+                <section class="riddle-card" aria-labelledby="riddle-title">
+                    <h2 id="riddle-title">🧠 脑筋急转弯小游戏</h2>
+                    <p class="riddle-question">只问一个问题：什么东西越洗越脏？</p>
+                    <div class="riddle-actions">
+                        <input id="riddle-answer" type="text" placeholder="输入你的答案，例如：水" aria-label="脑筋急转弯答案">
+                        <button id="riddle-submit" class="btn" type="button">提交答案</button>
+                    </div>
+                    <div id="riddle-feedback" class="riddle-feedback" role="status" aria-live="polite"></div>
+                </section>
 
                 <!-- Model Selection -->
                 <div class="form-group">
@@ -1186,9 +1272,37 @@
             }
         }
 
+
+        // Check the one-question brain teaser answer
+        function checkRiddleAnswer() {
+            const answerInput = document.getElementById('riddle-answer');
+            const feedback = document.getElementById('riddle-feedback');
+            const normalizedAnswer = answerInput.value.trim().replace(/[。！？!?,，\s]/g, '');
+
+            if (!normalizedAnswer) {
+                feedback.className = 'riddle-feedback hint';
+                feedback.textContent = '先写下你的答案吧。小提示：它常常被用来清洁别的东西。';
+                return;
+            }
+
+            if (normalizedAnswer.includes('水')) {
+                feedback.className = 'riddle-feedback success';
+                feedback.textContent = '答对啦！答案是“水”，因为水洗东西后会变脏。';
+            } else {
+                feedback.className = 'riddle-feedback hint';
+                feedback.textContent = '还差一点！提示：洗衣服、洗手、洗菜时都会用到它。';
+            }
+        }
+
         // Set up event listeners
         function setupEventListeners() {
             // Load model button
+            document.getElementById('riddle-submit').addEventListener('click', checkRiddleAnswer);
+            document.getElementById('riddle-answer').addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    checkRiddleAnswer();
+                }
+            });
             document.getElementById('load-model-btn').addEventListener('click', loadModel);
             
             // Load data button
